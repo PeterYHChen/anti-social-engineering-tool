@@ -14,25 +14,25 @@
     };
 
     chrome.tabs.query(queryInfo, (tabs) => {
-    // chrome.tabs.query invokes the callback with a list of tabs that match the
-    // query. When the popup is opened, there is certainly a window and at least
-    // one tab, so we can safely assume that |tabs| is a non-empty array.
-    // A window can only have one active tab at a time, so the array consists of
-    // exactly one tab.
-    var tab = tabs[0];
+        // chrome.tabs.query invokes the callback with a list of tabs that match the
+        // query. When the popup is opened, there is certainly a window and at least
+        // one tab, so we can safely assume that |tabs| is a non-empty array.
+        // A window can only have one active tab at a time, so the array consists of
+        // exactly one tab.
+        var tab = tabs[0];
 
-    // A tab is a plain object that provides information about the tab.
-    // See https://developer.chrome.com/extensions/tabs#type-Tab
-    var url = tab.url;
+        // A tab is a plain object that provides information about the tab.
+        // See https://developer.chrome.com/extensions/tabs#type-Tab
+        var url = tab.url;
 
-    // tab.url is only available if the "activeTab" permission is declared.
-    // If you want to see the URL of other tabs (e.g. after removing active:true
-    // from |queryInfo|), then the "tabs" permission is required to see their
-    // "url" properties.
-    console.assert(typeof url == 'string', 'tab.url should be a string');
-
-    callback(url);
-});
+        // tab.url is only available if the "activeTab" permission is declared.
+        // If you want to see the URL of other tabs (e.g. after removing active:true
+        // from |queryInfo|), then the "tabs" permission is required to see their
+        // "url" properties.
+        console.assert(typeof url == 'string', 'tab.url should be a string');
+        console.log("Current URL: " + url);
+        callback(url);
+    });
 
     // Most methods of the Chrome extension APIs are asynchronous. This means that
     // you CANNOT do something like this:
@@ -74,18 +74,31 @@ function analyze() {
 
 chrome.runtime.onMessage.addListener(function(request, sender) {
     if (request.action == "getDomains") {
-        console.log(request.source);
-        drawChart(request.source);
+        let domainMap = request.source;
+        console.log(domainMap);
+        drawChart(domainMap);
     }
 });
 
-function drawChart(dataMap) {
+function drawChart(domainMap) {
+    // Calculate the sum of total links
+    let validLinkCount = 0;
+    for (let domain in domainMap) {
+        validLinkCount += domainMap[domain];
+    }
+
+    // Transform domain map to percentage
+    let domainPercentMap = {};
+    for (let domain in domainMap) {
+        domainPercentMap[domain] = (domainMap[domain] * 100 / validLinkCount).toFixed(1);
+    }
+
     var domainData = [];
     var domains = [];
     var counts = [];
-    for(let domain in dataMap) {
-        domains.push(domain);
-        counts.push(dataMap[domain]);
+    for(let domain in domainPercentMap) {
+        domains.push(domain + "(" + domainPercentMap[domain] + "%)");
+        counts.push(domainMap[domain]);
     }
 
     var backgroundColor = [];
@@ -102,22 +115,64 @@ function drawChart(dataMap) {
         hoverBackgroundColor.push(h);
     }
 
-    var chartData = {};
-    chartData.labels = domains;
-    chartData.datasets = [];
-    chartData.datasets.push({
+    var pieChartData = {};
+    pieChartData.labels = domains;
+    pieChartData.datasets = [];
+    pieChartData.datasets.push({
         data: counts,
         backgroundColor: backgroundColor,
         hoverBackgroundColor: hoverBackgroundColor
     });
 
-    console.log(chartData);
-    var ctx = document.getElementById("myChart").getContext("2d");
-    var dataSetValues = [];
+    console.log(pieChartData);
+    var ctx = document.getElementById("pieChart").getContext("2d");
 
     var myChart = new Chart(ctx, {
         type: 'pie',
-        data: chartData
+        data: pieChartData
+    });
+
+    // Display stacked bar chart
+    var barChartData = {};
+    barChartData.labels = domains;
+    barChartData.datasets = [];
+    for (let i = 0; i < counts.length; i++) {
+        barChartData.datasets.push({
+            data: [counts[i]],
+            backgroundColor: [backgroundColor[i]],
+            hoverBackgroundColor: [hoverBackgroundColor[i]]
+        });
+    }
+    console.log(barChartData);
+    ctx = document.getElementById("barChart").getContext("2d");
+
+    var myChart = new Chart(ctx, {
+        type: 'horizontalBar',
+        data: barChartData,
+        options: {
+            scales: {
+                xAxes: [{
+                    stacked: true
+                }],
+                yAxes: [{
+                    stacked: true
+                }]
+            },
+            backgroundColor: { fill:'transparent' }
+        }
+    });
+
+    // Set severity by comparing the current url with the one in the chart
+    getCurrentTabUrl((url) => {
+        document.getElementById("currUrl").innerHTML = url;
+        let currDomain = extractRootDomain(url);
+        let currDomainPercent = domainPercentMap[currDomain];
+        if (currDomainPercent == null) {
+            currDomainPercent = 0;
+        }
+
+        document.getElementById("severity").innerHTML = currDomainPercent + "% of the links in this websites are safe.";
+         
     });
 }
 
@@ -165,20 +220,58 @@ document.addEventListener('DOMContentLoaded', () => {
     getCurrentTabUrl((url) => {
         var dropdown = document.getElementById('dropdown');
 
-    // Load the saved dropdown option for this page and modify the dropdown
-    // value, if needed.
-    getSavedDropdownOption(url, (savedOption) => {
-        if (savedOption) {
-            changeDropdownOption(savedOption);
-            dropdown.value = savedOption;
-        }
-    });
+        // Load the saved dropdown option for this page and modify the dropdown
+        // value, if needed.
+        getSavedDropdownOption(url, (savedOption) => {
+            if (savedOption) {
+                changeDropdownOption(savedOption);
+                dropdown.value = savedOption;
+            }
+        });
 
-    // Ensure the dropdown option is changed and saved when the dropdown
-    // selection changes.
-    dropdown.addEventListener('change', () => {
-        changeDropdownOption(dropdown.value);
-        saveDropdownOption(url, dropdown.value);
+        // Ensure the dropdown option is changed and saved when the dropdown
+        // selection changes.
+        dropdown.addEventListener('change', () => {
+            changeDropdownOption(dropdown.value);
+            saveDropdownOption(url, dropdown.value);
+        });
     });
 });
-});
+
+
+function extractHostname(url) {
+    var hostname;
+    //find & remove protocol (http, ftp, etc.) and get hostname
+
+    if (url.indexOf("://") > -1) {
+        hostname = url.split('/')[2];
+    }
+    else {
+        hostname = url.split('/')[0];
+    }
+
+    //find & remove port number
+    hostname = hostname.split(':')[0];
+    //find & remove "?"
+    hostname = hostname.split('?')[0];
+
+    return hostname;
+}
+
+function extractRootDomain(url) {
+    var domain = extractHostname(url),
+        splitArr = domain.split('.'),
+        arrLen = splitArr.length;
+
+    //extracting the root domain here
+    //if there is a subdomain 
+    if (arrLen > 2) {
+        domain = splitArr[arrLen - 2] + '.' + splitArr[arrLen - 1];
+        //check to see if it's using a Country Code Top Level Domain (ccTLD) (i.e. ".me.uk")
+        if (splitArr[arrLen - 1].length == 2 && splitArr[arrLen - 1].length == 2) {
+            //this is using a ccTLD
+            domain = splitArr[arrLen - 3] + '.' + domain;
+        }
+    }
+    return domain;
+}
