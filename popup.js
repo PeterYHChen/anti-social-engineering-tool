@@ -6,14 +6,14 @@
  *   is found.
  */
  function getCurrentTabUrl(callback) {
-  // Query filter to be passed to chrome.tabs.query - see
-  // https://developer.chrome.com/extensions/tabs#method-query
-  var queryInfo = {
-    active: true,
-    currentWindow: true
-};
+    // Query filter to be passed to chrome.tabs.query - see
+    // https://developer.chrome.com/extensions/tabs#method-query
+    var queryInfo = {
+        active: true,
+        currentWindow: true
+    };
 
-chrome.tabs.query(queryInfo, (tabs) => {
+    chrome.tabs.query(queryInfo, (tabs) => {
     // chrome.tabs.query invokes the callback with a list of tabs that match the
     // query. When the popup is opened, there is certainly a window and at least
     // one tab, so we can safely assume that |tabs| is a non-empty array.
@@ -34,14 +34,14 @@ chrome.tabs.query(queryInfo, (tabs) => {
     callback(url);
 });
 
-  // Most methods of the Chrome extension APIs are asynchronous. This means that
-  // you CANNOT do something like this:
-  //
-  // var url;
-  // chrome.tabs.query(queryInfo, (tabs) => {
-  //   url = tabs[0].url;
-  // });
-  // alert(url); // Shows "undefined", because chrome.tabs.query is async.
+    // Most methods of the Chrome extension APIs are asynchronous. This means that
+    // you CANNOT do something like this:
+    //
+    // var url;
+    // chrome.tabs.query(queryInfo, (tabs) => {
+    //   url = tabs[0].url;
+    // });
+    // alert(url); // Shows "undefined", because chrome.tabs.query is async.
 }
 
 /**
@@ -130,12 +130,12 @@ function drawChart(dataMap) {
  *     the given url on success, or a falsy value if no option is retrieved.
  */
  function getSavedDropdownOption(url, callback) {
-  // See https://developer.chrome.com/apps/storage#type-StorageArea. We check
-  // for chrome.runtime.lastError to ensure correctness even when the API call
-  // fails.
-  chrome.storage.sync.get(url, (items) => {
-    callback(chrome.runtime.lastError ? null : items[url]);
-});
+    // See https://developer.chrome.com/apps/storage#type-StorageArea. We check
+    // for chrome.runtime.lastError to ensure correctness even when the API call
+    // fails.
+    chrome.storage.sync.get(url, (items) => {
+        callback(chrome.runtime.lastError ? null : items[url]);
+    });
 }
 
 /**
@@ -147,10 +147,10 @@ function drawChart(dataMap) {
  function saveDropdownOption(url, option) {
     var items = {};
     items[url] = option;
-  // See https://developer.chrome.com/apps/storage#type-StorageArea. We omit the
-  // optional callback since we don't need to perform any action once the
-  // dropdown option is saved.
-  chrome.storage.sync.set(items);
+    // See https://developer.chrome.com/apps/storage#type-StorageArea. We omit the
+    // optional callback since we don't need to perform any action once the
+    // dropdown option is saved.
+    chrome.storage.sync.set(items);
 }
 
 // This extension loads the saved dropdown option for the current tab if one
