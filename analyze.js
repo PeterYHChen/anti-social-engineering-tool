@@ -36,15 +36,9 @@ for(var i=0; i<links.length; i++) {
     }
 }
 
-// Transform domain map to percentage
-var dataMap = {};
-for (let domain in domainMap) {
-    dataMap[domain + "(" + (domainMap[domain] * 100 / validLinkCount).toFixed(1) + "%)"] = domainMap[domain];
-}
-
 chrome.runtime.sendMessage({
     action: "getDomains",
-    source: dataMap
+    source: domainMap
 });
 
 
