@@ -5,25 +5,11 @@
  value "popup.html".
 -->
 <html>
+
 <head>
     <title>Getting Started Extension's Popup</title>
-    <style type="text/css">
-        body {
-            margin: 10px;
-            white-space: nowrap;
-        }
 
-        h1 {
-            font-size: 15px;
-        }
-
-        #container {
-            align-items: center;
-            display: flex;
-            justify-content: space-between;
-        }
-    </style>
-
+    <link rel="stylesheet" type="text/css" href="popup.css">
     <!--
       - JavaScript and HTML must be in separate files: see our Content Security
       - Policy documentation[1] for details and explanation.
@@ -43,9 +29,10 @@
             <option value="analyze">Analyze</option>
         </select>
     </div>
-    <canvas id="pieChart" width="400" height="400"></canvas>
-    <div id="currUrl"></div>
+    <meter id="severity-meter" class="severity-bar" min="0" low="40" high="75" max="100" value="0" optimum="90"></meter>
     <div id="severity"></div>
-    <canvas id="barChart" width="400" height="400"></canvas>
+    <canvas id="pieChart" width="500" height="500"></canvas>
+    <!-- <div id="currUrl"></div> -->
 </body>
+
 </html>

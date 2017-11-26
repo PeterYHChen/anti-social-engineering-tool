@@ -5,7 +5,7 @@
  * @param {function(string)} callback called when the URL of the current tab
  *   is found.
  */
- function getCurrentTabUrl(callback) {
+function getCurrentTabUrl(callback) {
     // Query filter to be passed to chrome.tabs.query - see
     // https://developer.chrome.com/extensions/tabs#method-query
     var queryInfo = {
@@ -49,30 +49,30 @@
  *
  * @param {string} option The new dropdown option.
  */
- function changeDropdownOption(option) {
+function changeDropdownOption(option) {
     var script;
     if (option == 'analyze') {
         analyze();
     } else {
-    // script = 'document.body.style.dropdown olor="' + option + '";';
-    //   // See https://developer.chrome.com/extensions/tabs#method-executeScript.
-    //   // chrome.tabs.executeScript allows us to programmatically inject JavaScript
-    //   // into a page. Since we omit the optional first argument "tabId", the script
-    //   // is inserted into the active tab of the current window, which serves as the
-    //   // default.
-    //   chrome.tabs.executeScript({
-    //     code: script
-    //   });
-}
+        // script = 'document.body.style.dropdown olor="' + option + '";';
+        //   // See https://developer.chrome.com/extensions/tabs#method-executeScript.
+        //   // chrome.tabs.executeScript allows us to programmatically inject JavaScript
+        //   // into a page. Since we omit the optional first argument "tabId", the script
+        //   // is inserted into the active tab of the current window, which serves as the
+        //   // default.
+        //   chrome.tabs.executeScript({
+        //     code: script
+        //   });
+    }
 }
 
 function analyze() {
     chrome.tabs.executeScript({
         file: 'analyze.js'
-    } );
+    });
 }
 
-chrome.runtime.onMessage.addListener(function(request, sender) {
+chrome.runtime.onMessage.addListener(function (request, sender) {
     if (request.action == "getDomains") {
         let domainMap = request.source;
         console.log(domainMap);
@@ -96,7 +96,7 @@ function drawChart(domainMap) {
     var domainData = [];
     var domains = [];
     var counts = [];
-    for(let domain in domainPercentMap) {
+    for (let domain in domainPercentMap) {
         domains.push(domain + "(" + domainPercentMap[domain] + "%)");
         counts.push(domainMap[domain]);
     }
@@ -110,7 +110,7 @@ function drawChart(domainMap) {
         b = Math.floor(Math.random() * 200);
         v = Math.floor(Math.random() * 500);
         c = 'rgb(' + r + ', ' + g + ', ' + b + ')';
-        h = 'rgb(' + (r+20) + ', ' + (g+20) + ', ' + (b+20) + ')';
+        h = 'rgb(' + (r + 20) + ', ' + (g + 20) + ', ' + (b + 20) + ')';
         backgroundColor.push(c);
         hoverBackgroundColor.push(h);
     }
@@ -132,39 +132,9 @@ function drawChart(domainMap) {
         data: pieChartData
     });
 
-    // Display stacked bar chart
-    var barChartData = {};
-    barChartData.labels = domains;
-    barChartData.datasets = [];
-    for (let i = 0; i < counts.length; i++) {
-        barChartData.datasets.push({
-            data: [counts[i]],
-            backgroundColor: [backgroundColor[i]],
-            hoverBackgroundColor: [hoverBackgroundColor[i]]
-        });
-    }
-    console.log(barChartData);
-    ctx = document.getElementById("barChart").getContext("2d");
-
-    var myChart = new Chart(ctx, {
-        type: 'horizontalBar',
-        data: barChartData,
-        options: {
-            scales: {
-                xAxes: [{
-                    stacked: true
-                }],
-                yAxes: [{
-                    stacked: true
-                }]
-            },
-            backgroundColor: { fill:'transparent' }
-        }
-    });
-
     // Set severity by comparing the current url with the one in the chart
     getCurrentTabUrl((url) => {
-        document.getElementById("currUrl").innerHTML = url;
+        // document.getElementById("currUrl").innerHTML = url;
         let currDomain = extractRootDomain(url);
         let currDomainPercent = domainPercentMap[currDomain];
         if (currDomainPercent == null) {
@@ -172,7 +142,8 @@ function drawChart(domainMap) {
         }
 
         document.getElementById("severity").innerHTML = currDomainPercent + "% of the links in this websites are safe.";
-         
+        document.getElementById("severity-meter").value = currDomainPercent;
+        document.getElementById("severity-meter").title = url;
     });
 }
 
@@ -184,7 +155,7 @@ function drawChart(domainMap) {
  * @param {function(string)} callback called with the saved dropdown option for
  *     the given url on success, or a falsy value if no option is retrieved.
  */
- function getSavedDropdownOption(url, callback) {
+function getSavedDropdownOption(url, callback) {
     // See https://developer.chrome.com/apps/storage#type-StorageArea. We check
     // for chrome.runtime.lastError to ensure correctness even when the API call
     // fails.
@@ -199,7 +170,7 @@ function drawChart(domainMap) {
  * @param {string} url URL for which dropdown option is to be saved.
  * @param {string} option The dropdown option to be saved.
  */
- function saveDropdownOption(url, option) {
+function saveDropdownOption(url, option) {
     var items = {};
     items[url] = option;
     // See https://developer.chrome.com/apps/storage#type-StorageArea. We omit the
@@ -264,7 +235,7 @@ function extractRootDomain(url) {
         arrLen = splitArr.length;
 
     //extracting the root domain here
-    //if there is a subdomain 
+    //if there is a subdomain
     if (arrLen > 2) {
         domain = splitArr[arrLen - 2] + '.' + splitArr[arrLen - 1];
         //check to see if it's using a Country Code Top Level Domain (ccTLD) (i.e. ".me.uk")
