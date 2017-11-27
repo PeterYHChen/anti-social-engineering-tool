@@ -70,6 +70,12 @@ function analyze() {
     chrome.tabs.executeScript({
         file: 'analyze.js'
     });
+    chrome.tabs.insertCSS(
+        null,
+        {
+            file: 'popup-link.css'
+        }
+    );
 }
 
 chrome.runtime.onMessage.addListener(function (request, sender) {

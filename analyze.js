@@ -4,14 +4,20 @@ console.log(links);
 
 var domainMap = {};
 var validLinkCount = 0;
-for(var i=0; i<links.length; i++) {
+var popupLinkPageHTML = chrome.extension.getURL("popup-link.html");
+for (var i = 0; i < links.length; i++) {
+    links[i].addEventListener("mouseenter", mouseEnter);
+    links[i].addEventListener("mouseleave", mouseLeave);
+    links[i].innerHTML += "<div class=\"popup-box\" id=\"popup-linkr\">A Simple Popup!</div>";
+    // links[i].innerHTML += "<div class=\"popup-link\">Popup box</div>";
+    // links[i].innerHTML += '<object type="text/html" data="' + popupLinkPageHTML + '"></object>';
     let rootDomain = extractRootDomain(links[i].href);
 
     // Skip empty string
     if (rootDomain == null || rootDomain == '') {
         continue;
     }
-    
+
     // Add to the map for counting
     if (domainMap[rootDomain] == null) {
         domainMap[rootDomain] = 0;
@@ -67,7 +73,7 @@ function extractRootDomain(url) {
         arrLen = splitArr.length;
 
     //extracting the root domain here
-    //if there is a subdomain 
+    //if there is a subdomain
     if (arrLen > 2) {
         domain = splitArr[arrLen - 2] + '.' + splitArr[arrLen - 1];
         //check to see if it's using a Country Code Top Level Domain (ccTLD) (i.e. ".me.uk")
@@ -77,4 +83,30 @@ function extractRootDomain(url) {
         }
     }
     return domain;
+}
+
+function mouseEnter() {
+    this.style.color = "red";
+    // var div = document.getElementById("popup-link");
+    // if (div == null) {
+    // var div = document.createElement('DIV');
+    // div.id = "popup-link";
+    // div.className = "popup-box";
+    // div.innerText = "hello";
+    // this.appendChild(div);
+    // }
+    // console.log(div);
+
+    var popup = document.getElementById("popup-link");
+    popup.style.display = "block";
+    console.log(popup);
+}
+
+function mouseLeave() {
+    this.style.color = "black";
+    // document.removeChild(document.getElementById("popup-link"));
+
+    var popup = document.getElementById("popup-link");
+    popup.style.display = "none";
+    console.log(popup);
 }
