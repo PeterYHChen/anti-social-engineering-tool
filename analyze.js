@@ -5,12 +5,14 @@ console.log(links);
 var domainMap = {};
 var validLinkCount = 0;
 var popupLinkPageHTML = chrome.extension.getURL("popup-link.html");
-for (var i = 0; i < links.length; i++) {
-    links[i].addEventListener("mouseenter", mouseEnter);
-    links[i].addEventListener("mouseleave", mouseLeave);
-    links[i].innerHTML += "<div class=\"popup-box\" id=\"popup-linkr\">A Simple Popup!</div>";
-    // links[i].innerHTML += "<div class=\"popup-link\">Popup box</div>";
-    // links[i].innerHTML += '<object type="text/html" data="' + popupLinkPageHTML + '"></object>';
+for (let i = 0; i < links.length; i++) {
+    links[i].addEventListener("mouseenter", () => {
+        showPopup(i, links[i].href);
+    });
+    links[i].addEventListener("mouseleave", () => {
+        hidePopup(i);
+    });
+    links[i].innerHTML += "<div class=\"popup-box\" id=\"popup-link-" + i + "\">A Simple Popup!</div>";
     let rootDomain = extractRootDomain(links[i].href);
 
     // Skip empty string
@@ -85,28 +87,38 @@ function extractRootDomain(url) {
     return domain;
 }
 
-function mouseEnter() {
-    this.style.color = "red";
-    // var div = document.getElementById("popup-link");
-    // if (div == null) {
-    // var div = document.createElement('DIV');
-    // div.id = "popup-link";
-    // div.className = "popup-box";
-    // div.innerText = "hello";
-    // this.appendChild(div);
-    // }
-    // console.log(div);
-
-    var popup = document.getElementById("popup-link");
+function showPopup(index, url) {
+    console.log(index);
+    console.log(url);
+    // this.style.color = "red";
+    var popup = document.getElementById("popup-link-" + index);
     popup.style.display = "block";
-    console.log(popup);
+
+    var request = makeHttpObject();
+    request.open("GET", url, true);
+    request.send(null);
+    request.onreadystatechange = function () {
+        if (request.readyState == 4)
+            alert(request.responseText);
+        // popup.innerHTML = request.responseText;
+    };
 }
 
-function mouseLeave() {
-    this.style.color = "black";
-    // document.removeChild(document.getElementById("popup-link"));
+function hidePopup(index) {
+    console.log(index);
+    // this.style.color = "black";
 
-    var popup = document.getElementById("popup-link");
+    var popup = document.getElementById("popup-link-" + index);
     popup.style.display = "none";
-    console.log(popup);
+}
+
+function makeHttpObject() {
+    try { return new XMLHttpRequest(); }
+    catch (error) { }
+    try { return new ActiveXObject("Msxml2.XMLHTTP"); }
+    catch (error) { }
+    try { return new ActiveXObject("Microsoft.XMLHTTP"); }
+    catch (error) { }
+
+    throw new Error("Could not create HTTP request object.");
 }
