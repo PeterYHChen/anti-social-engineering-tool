@@ -14,9 +14,10 @@
 .popup-box {
     display: none;
     position: absolute;
-    width: 280px;
+    z-index: 1015;
+    width: auto;
     padding: 10px;
-    background: #fff;
+    background: rgba(256,256,256,1);
     color: #000000;
     border: 1px solid #1a1a1a;
     font-size: 90%;
