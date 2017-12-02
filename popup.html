@@ -1,40 +1,36 @@
 <!doctype html>
 <!--
- This page is shown when the extension button is clicked, because the
- "browser_action" field in manifest.json contains the "default_popup" key with
- value "popup.html".
+This page is shown when the extension button is clicked, because the
+"browser_action" field in manifest.json contains the "default_popup" key with
+value "popup.html".
 -->
 <html>
-
-<head>
-    <title>ASET CIMS</title>
-
-    <link rel="stylesheet" type="text/css" href="popup.css">
-    <!--
-      - JavaScript and HTML must be in separate files: see our Content Security
-      - Policy documentation[1] for details and explanation.
-      -
-      - [1]: https://developer.chrome.com/extensions/contentSecurityPolicy
-    -->
-    <script src="popup.js"></script>
-    <script src="chartjs/Chart.js"></script>
-</head>
-
-<body>
-    <h1>Anti-Social Engineering Tool</h1>
-    <div id="container">
-        <span>Pick an action</span>
-        <select id="dropdown">
-            <option selected disabled hidden value=''></option>
-            <option value="analyze">Analyze</option>
-        </select>
-    </div>
-    <div id="popup-link">
-    </div>
-    <meter id="severity-meter" class="severity-bar" min="0" low="40" high="75" max="100" value="0" optimum="90"></meter>
-    <div id="severity"></div>
-    <canvas id="pieChart" width="500" height="500"></canvas>
-    <!-- <div id="currUrl"></div> -->
-</body>
-
+    <head>
+        <title>ASET CIMS</title>
+        <link rel="stylesheet" type="text/css" href="popup.css">
+        <!--
+        - JavaScript and HTML must be in separate files: see our Content Security
+        - Policy documentation[1] for details and explanation.
+        -
+        - [1]: https://developer.chrome.com/extensions/contentSecurityPolicy
+        -->
+        <script src="popup.js"></script>
+        <script src="chartjs/Chart.js"></script>
+    </head>
+    <body>
+        <h1>Anti-Social Engineering Tool</h1>
+        <div id="container">
+            <span>Pick an action</span>
+            <select id="dropdown">
+                <option selected disabled hidden value=''></option>
+                <option value="analyze">Analyze</option>
+            </select>
+        </div>
+        <div id="popup-link">
+        </div>
+        <meter id="severity-meter" class="severity-bar" min="0" low="40" high="75" max="100" value="0" optimum="90"></meter>
+        <div id="severity"></div>
+        <canvas id="pieChart" width="500" height="300"></canvas>
+        <!-- <div id="currUrl"></div> -->
+    </body>
 </html>
