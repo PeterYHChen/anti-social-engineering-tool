@@ -67,9 +67,10 @@ function changeDropdownOption(option) {
 }
 
 function analyze() {
-    chrome.tabs.executeScript({
-        file: 'analyze.js'
+    chrome.tabs.executeScript(null, { file: 'chartjs/Chart.js' }, function () {
+        chrome.tabs.executeScript({ file: 'analyze.js' });
     });
+    chrome.tabs.insertCSS(null, { file: 'popup-link.css' });
 }
 
 chrome.runtime.onMessage.addListener(function (request, sender) {
