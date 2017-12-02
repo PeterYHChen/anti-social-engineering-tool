@@ -1,12 +1,12 @@
 {
     "manifest_version": 2,
-    "name": "Getting started example",
-    "description": "This extension allows the user to change the background color of the current page.",
+    "name": "Social Engineering Defender",
+    "description": "This extension allows to user to observe social engineering properties of sites if they exist.",
     "version": "1.0",
     "browser_action": {
         "default_icon": "icon.png",
         "default_popup": "popup.html",
-        "default_title": "Extention test!"
+        "default_title": "ASET"
     },
     "permissions": [
         "https://anti-social-engineering-tool.mybluemix.net/*",

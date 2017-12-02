@@ -1,0 +1,40 @@
+<!doctype html>
+<!--
+This page is shown when the extension button is clicked, because the
+"browser_action" field in manifest.json contains the "default_popup" key with
+value "popup.html".
+-->
+<html>
+    <head>
+        <title>Anti-Social Engineering Tool</title>
+        <link rel="stylesheet" type="text/css" href="popup.css">
+        <!--
+        - JavaScript and HTML must be in separate files: see our Content Security
+        - Policy documentation[1] for details and explanation.
+        -
+        - [1]: https://developer.chrome.com/extensions/contentSecurityPolicy
+        -->
+        <script src="popup.js"></script>
+        <script src="chartjs/Chart.js"></script>
+    </head>
+    <body>
+        <h1>Anti-Social Engineering Tool</h1>
+        <div id="container" class="select">
+            <select id="dropdown">
+                <option class="option" id= "dropdown_pick-an-action" selected disabled hidden value=''>Pick An Action</option>
+                <option class="option" id="dropdown_analyze" value="analyze">Analyze</option>
+            </select>
+        </div>
+
+        <div id="popup-link">
+        </div>
+        <div id="meter">
+            <meter id="severity-meter" class="severity-bar" min="0" low="40" high="75" max="100" value="0" optimum="90"></meter>
+            <div id="severity"></div>
+        </div>
+        <canvas id="pieChart" width="500" height="300"></canvas>
+        <!-- <div id="currUrl"></div> -->
+        <link href='https://fonts.googleapis.com/css?family=Lato:300,400,700,900' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="http://fontawesome.io/assets/font-awesome/css/font-awesome.css">
+    </body>
+</html>
