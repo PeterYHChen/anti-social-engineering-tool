@@ -247,3 +247,5 @@ function extractRootDomain(url) {
     }
     return domain;
 }
+
+
