@@ -1,7 +1,6 @@
 body {
-    margin: 10px;
+    margin: 30px;
     white-space: nowrap;
-    height: 30px;
 }
 
 h1 {
@@ -12,11 +11,13 @@ h1 {
     align-items: center;
     display: flex;
     justify-content: space-between;
+    float: right;
 }
 
 
 #meter {
 	margin: 2em auto;
+    margin-top: 60px;
 }
 
 meter { 
@@ -36,6 +37,7 @@ select {
   border: 0 !important;
   background: #2c3e50;
   background-image: none;
+  float:right;
 }
 /* Custom Select */
 .select {

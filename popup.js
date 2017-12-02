@@ -125,7 +125,7 @@ function drawChart(domainMap) {
         hoverBackgroundColor: hoverBackgroundColor
     });
 
-    console.log(pieChartData);
+    console.log('%c' + pieChartData, 'font-size:8px;');
     var ctx = document.getElementById("pieChart").getContext("2d");
 
     var myChart = new Chart(ctx, {
