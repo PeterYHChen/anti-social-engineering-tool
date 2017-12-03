@@ -1,5 +1,5 @@
 
-var domainMap = getDomainMapFromDoc(document);
+var domainMap = getDomainMapFromDoc(document, null);
 var links = document.getElementsByTagName("a");
 for (let i = 0; i < links.length; i++) {
     links[i].addEventListener("mouseenter", () => {
@@ -34,33 +34,65 @@ chrome.runtime.sendMessage({
     source: domainMap
 });
 
-function getDomainMapFromDoc(htmlDoc) {
-    var links = htmlDoc.getElementsByTagName("a");
-    console.log(links);
+function getDomainMapFromDoc(htmlDoc, baseUrl) {
+    let links = htmlDoc.getElementsByTagName("a");
+    // console.log(links);
 
-    var domainMap = {};
+    let urls = [];
     for (let i = 0; i < links.length; i++) {
         let rootDomain = extractRootDomain(links[i].href);
+        urls.push(links[i].href);
+    }
 
-        // Skip empty string
-        if (rootDomain == null || rootDomain == '') {
-            continue;
+    let domainCountMap = getDomainCountMapFromUrls(urls, baseUrl);
+    return domainCountMap;
+}
+
+function getDomainCountMapFromUrls(urls, baseUrl) {
+    urls = preprocessUrls(urls, baseUrl);
+    let baseDomain = extractRootDomain(baseUrl);
+
+    let domainCountMap = {};
+    for (let i = 0; i < urls.length; i++) {
+        let rootDomain = extractRootDomain(urls[i]);
+        // If no root domain, it is based on the baseDomain for navigation
+        if (rootDomain == null || rootDomain.trim() == '') {
+            if (baseDomain == null) {
+                continue;
+            }
+            rootDomain = baseDomain;
         }
+        console.log(rootDomain + "    " + urls[i]);
 
         // Add to the map for counting
-        if (domainMap[rootDomain] == null) {
-            domainMap[rootDomain] = 0;
+        if (domainCountMap[rootDomain] == null) {
+            domainCountMap[rootDomain] = 0;
         }
-        domainMap[rootDomain] = domainMap[rootDomain] + 1;
+        domainCountMap[rootDomain] = domainCountMap[rootDomain] + 1;
     }
-    return domainMap;
+    return domainCountMap;
+}
+
+function preprocessUrls(urls, baseUrl) {
+    for (let i = 0; i < urls.length; i++) {
+        if (urls[i] == null) {
+            urls[i] = baseUrl;
+        } else if (urls[i].trim() == "" || urls[i].startsWith("#")) {
+            urls[i] = baseUrl + urls[i];
+        }
+    }
+    return urls;
 }
 
 function extractHostname(url) {
+    if (url == null) {
+        return url;
+    }
+
     var hostname;
     //find & remove protocol (http, ftp, etc.) and get hostname
 
-    if (url.indexOf("://") > -1) {
+    if (url.indexOf("//") > -1) {
         hostname = url.split('/')[2];
     }
     else {
@@ -76,6 +108,10 @@ function extractHostname(url) {
 }
 
 function extractRootDomain(url) {
+    if (url == null) {
+        return url;
+    }
+
     var domain = extractHostname(url),
         splitArr = domain.split('.'),
         arrLen = splitArr.length;
@@ -121,18 +157,12 @@ function showPopup(index, url) {
         console.log("response: " + JSON.stringify(response));
     });
 
-    var request = makeHttpObject();
-    request.open("GET", "https://anti-social-engineering-tool.mybluemix.net/page?url=" + url, true);
-    request.send(null);
-    request.onreadystatechange = function () {
-        if (request.readyState == 4) {
-            // console.log(request);
-            var dummyDoc = document.createElement('dummyDoc');
-            dummyDoc.innerHTML = request.responseText;
-            var domainMap = getDomainMapFromDoc(dummyDoc);
+    getLinksFromUrlPage(url, function (arrayLinks) {
+        if (arrayLinks instanceof Array) {
+            let domainMap = getDomainCountMapFromUrls(arrayLinks, url);
             drawChart(domainMap, index, url);
         }
-    };
+    });
 }
 
 function hidePopup(index) {
@@ -154,17 +184,17 @@ function makeHttpObject() {
 }
 
 
-function drawChart(domainMap, index, url) {
+function drawChart(domainCountMap, index, url) {
     // Calculate the sum of total links
     let validLinkCount = 0;
-    for (let domain in domainMap) {
-        validLinkCount += domainMap[domain];
+    for (let domain in domainCountMap) {
+        validLinkCount += domainCountMap[domain];
     }
 
     // Transform domain map to percentage
     let domainPercentMap = {};
-    for (let domain in domainMap) {
-        domainPercentMap[domain] = (domainMap[domain] * 100 / validLinkCount).toFixed(1);
+    for (let domain in domainCountMap) {
+        domainPercentMap[domain] = (domainCountMap[domain] * 100 / validLinkCount).toFixed(1);
     }
 
     var domainData = [];
@@ -172,7 +202,7 @@ function drawChart(domainMap, index, url) {
     var counts = [];
     for (let domain in domainPercentMap) {
         domains.push(domain + "(" + domainPercentMap[domain] + "%)");
-        counts.push(domainMap[domain]);
+        counts.push(domainCountMap[domain]);
     }
 
     var backgroundColor = [];
@@ -216,6 +246,18 @@ function drawChart(domainMap, index, url) {
 
     document.getElementById("severity-" + index).innerHTML = currDomainPercent + "% of the links in this websites are safe.";
     document.getElementById("severity-meter-" + index).value = currDomainPercent;
+}
+
+function getLinksFromUrlPage(url, callback) {
+    var request = makeHttpObject();
+    request.open("GET", "https://anti-social-engineering-tool.mybluemix.net/links?url=" + url, true);
+    request.send(null);
+    request.onreadystatechange = function () {
+        if (request.readyState == 4) {
+            var linkArray = JSON.parse(request.responseText);
+            callback(linkArray);
+        }
+    };
 }
 
 // Send URL for Google safe browsing API check

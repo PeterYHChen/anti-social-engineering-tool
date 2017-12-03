@@ -16,6 +16,7 @@ import os
 import json
 import requests
 from flask import Flask, jsonify, request
+from BeautifulSoup import BeautifulSoup
 
 app = Flask(__name__)
 
@@ -34,6 +35,25 @@ def getPage():
             return result.content
         except requests.exceptions.Timeout:
             return "Timeout to get webpage from " + url, 408
+        except:
+            return "Network problem, fail to commuicate with url: " + url, 503
+    else:
+        return "No url is specified"
+
+# 408 for timeout error, 503 for no network error
+@app.route('/links')
+def getLinks():
+    url = request.args.get('url')
+    if url:
+        try:
+            result = requests.get(url, timeout=10)
+            soup = BeautifulSoup(result.content)
+            hrefs = list()
+            for link in soup.findAll('a'):
+                hrefs.append(link.get('href'))
+            return json.dumps(hrefs)
+        except requests.exceptions.Timeout:
+            return "Timeout to get links from " + url, 408
         except:
             return "Network problem, fail to commuicate with url: " + url, 503
     else:

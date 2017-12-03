@@ -78,6 +78,7 @@ chrome.runtime.onMessage.addListener(function (request, sender) {
         let domainMap = request.source;
         console.log(domainMap);
         drawChart(domainMap);
+        return true;
     }
 });
 
