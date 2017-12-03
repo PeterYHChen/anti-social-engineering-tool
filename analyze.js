@@ -9,6 +9,7 @@ for (let i = 0; i < links.length; i++) {
         hidePopup(i);
     });
     links[i].innerHTML += "<div class=\"popup-box\" id=\"popup-link-" + i + "\">" +
+        "<div id=\"link-check-" + i + "\" class=\"link-check\"></div>" +
         "<meter id=\"severity-meter-" + i + "\" class=\"severity-bar\" min=\"0\" low=\"40\" high=\"75\" max=\"100\" value=\"0\" optimum=\"90\"></meter>" +
         "<div id=\"severity-" + i + "\"></div>" +
         "<canvas id=\"pieChart-" + i + "\" width=\"500\" height=\"500\"></canvas>" +
@@ -92,12 +93,33 @@ function extractRootDomain(url) {
     return domain;
 }
 
+// Set up a global variable map to avoid re-sending request for the same url.
+var urlCheckedMap = {};
+
 function showPopup(index, url) {
     console.log(index);
     console.log(url);
     // this.style.color = "red";
     var popup = document.getElementById("popup-link-" + index);
     popup.style.display = "block";
+
+    // Index is used to identify each url
+    // If the url of current index has been visited and requests for it have been sent out
+    if (urlCheckedMap[index]) {
+        return;
+    }
+    urlCheckedMap[index] = true;
+
+    getUrlSafeBrowserCheck(url, function (response) {
+        let linkCheck = document.getElementById("link-check-" + index);
+        linkCheck.innerText = response.message;
+        if (response.status == "SUCCESS") {
+            linkCheck.style.color = "green";
+        } else {
+            linkCheck.style.color = "red";
+        }
+        console.log("response: " + JSON.stringify(response));
+    });
 
     var request = makeHttpObject();
     request.open("GET", "https://anti-social-engineering-tool.mybluemix.net/page?url=" + url, true);
@@ -194,4 +216,61 @@ function drawChart(domainMap, index, url) {
 
     document.getElementById("severity-" + index).innerHTML = currDomainPercent + "% of the links in this websites are safe.";
     document.getElementById("severity-meter-" + index).value = currDomainPercent;
+}
+
+// Send URL for Google safe browsing API check
+function getUrlSafeBrowserCheck(url, callback) {
+    var request = makeHttpObject();
+    request.open("POST", "https://safebrowsing.googleapis.com/v4/threatMatches:find?key=AIzaSyAmcWZ1DEmX4IAtri4FUTNoKz2_Uh0ngPk", true);
+    request.setRequestHeader("Content-type", "application/json");
+
+    // Set up json body for Google safe browsing API check on URL
+    var jsonRequestBody = {
+        "client": {
+            "clientId": "nyu-pcs",
+            "clientVersion": "1.0.0"
+        },
+        "threatInfo": {
+            "threatTypes": ["MALWARE", "SOCIAL_ENGINEERING", "UNWANTED_SOFTWARE", "POTENTIALLY_HARMFUL_APPLICATION", "THREAT_TYPE_UNSPECIFIED"],
+            "platformTypes": ["ALL_PLATFORMS"],
+            "threatEntryTypes": ["URL"],
+            "threatEntries": [
+                // { "url": "http://goooogleadsence.biz/" },
+                { "url": url }
+            ]
+        }
+    };
+
+    var responseObject = {};
+    request.onreadystatechange = function () {//Call a function when the state changes.
+        if (request.readyState == XMLHttpRequest.DONE && request.status == 200) {
+            let jsonResponse = JSON.parse(request.responseText);
+            // No threat matches found
+            if (jsonResponse.matches == null) {
+                callback({
+                    "status": "SUCCESS",
+                    "message": "No threat is found in this link"
+                });
+            } else {
+                var message = "This link contains ";
+                console.log("matches: " + JSON.stringify(jsonResponse.matches));
+                for (let match of jsonResponse.matches) {
+                    message += match.threatType + ", ";
+                }
+                message += "be aware!";
+                callback({
+                    "status": "ERROR",
+                    "message": message
+                });
+            }
+        } else if (request.readyState == XMLHttpRequest.DONE) {
+            callback({
+                "status": "ERROR",
+                "message": "No connection. Fail to check safety on this link. Response code is " + request.status
+            });
+        }
+    };
+
+    // Send out json body
+    request.send(JSON.stringify(jsonRequestBody));
 }

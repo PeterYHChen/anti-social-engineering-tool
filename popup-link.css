@@ -14,7 +14,7 @@
 .popup-box {
     display: none;
     position: absolute;
-    z-index: 1015;
+    z-index: 2000;
     width: auto;
     padding: 10px;
     background: rgba(256,256,256,1);
@@ -22,4 +22,8 @@
     height: 400px;
     border: 1px solid #1a1a1a;
     font-size: 90%;
-  }
+}
+
+.popup-box .link-check {
+    font-size: 120%
+}
