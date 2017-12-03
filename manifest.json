@@ -10,6 +10,7 @@
     },
     "permissions": [
         "https://anti-social-engineering-tool.mybluemix.net/*",
+        "https://safebrowsing.googleapis.com/*",
         "activeTab",
         "storage"
     ]
