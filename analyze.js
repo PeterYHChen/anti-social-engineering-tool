@@ -11,21 +11,22 @@ for (let i = 0; i < links.length; i++) {
         "<div id=\"link-check-" + i + "\" class=\"link-check\"></div>" +
         "<meter id=\"severity-meter-" + i + "\" class=\"safety-bar\" min=\"0\" low=\"40\" high=\"75\" max=\"100\" value=\"0\" optimum=\"90\"></meter>" +
         "<div id=\"severity-" + i + "\"></div>" +
+        "<div id=\"tags-" + i + "\" class=\"tags\"></div>" +
         "<canvas id=\"pieChart-" + i + "\" width=\"500\" height=\"500\"></canvas>" +
         "</div>";
     links[i].title = links[i].href;
+    links[i].style = 'color: DarkGreen;';
+    // let wordsInLink = links[i].href.split(/[^A-Za-z]/);
+    // let wordsInLinkSet = new Set(wordsInLink);
 
-    let wordsInLink = links[i].href.split(/[^A-Za-z]/);
-    let wordsInLinkSet = new Set(wordsInLink);
-
-    if (links[i].href != links[i].innerText) {
-        // wordsInLink = links[i].href.split(/[^A-Za-z]/);
-        // wordsInLinkSet = new Set(wordsInLink);
-        if (!wordsInLinkSet.has(links[i].innerText.toLowerCase())) {
-            links[i].style = 'color: red;';
-        }
-        // links[i].innerText = links[i].innerText + '(' + links[i].href + ')';
-    }
+    // if (links[i].href != links[i].innerText) {
+    //     // wordsInLink = links[i].href.split(/[^A-Za-z]/);
+    //     // wordsInLinkSet = new Set(wordsInLink);
+    //     if (!wordsInLinkSet.has(links[i].innerText.toLowerCase())) {
+    //         links[i].style = 'color: red;';
+    //     }
+    //     // links[i].innerText = links[i].innerText + '(' + links[i].href + ')';
+    // }
 }
 
 function getDomainMapFromDoc(htmlDoc, baseUrl) {
@@ -138,6 +139,8 @@ function showPopup(index, url) {
     // If the url of current index has been visited and requests for it have been sent out
     if (!urlCheckedMap[index]) {
         urlCheckedMap[index] = true;
+
+        // Send url to Google for checking
         getUrlSafeBrowserCheck(url, function (response) {
             let linkCheck = document.getElementById("link-check-" + index);
             linkCheck.innerText = response.message;
@@ -149,12 +152,58 @@ function showPopup(index, url) {
             console.log("response: " + JSON.stringify(response));
         });
 
-        getLinksFromUrlPage(url, function (arrayLinks) {
+        // Get links of the webpage of the url and evaluate trust
+        sendUrlToGetWebPageLinks(url, function (arrayLinks) {
             if (arrayLinks instanceof Array) {
-                let domainMap = getDomainCountMapFromUrls(arrayLinks, url);
-                urlDomainCountMap[index] = domainMap;
-                sendDataToExtentionPopup("getDomains", domainMap, url);
-                // drawChart(domainMap, index, url);
+                let domainCountMap = getDomainCountMapFromUrls(arrayLinks, url);
+                urlDomainCountMap[index] = domainCountMap;
+                sendDataToExtentionPopup("getDomains", domainCountMap, url);
+
+                // Draw trust graph
+                let domains = [];
+                for (let domain in domainCountMap) {
+                    domains.push(domain);
+                }
+                sendUrlsForWOTCheck(domains, function (wotObjects) {
+                    let dataMap = {};
+                    for (let wotObject of wotObjects) {
+                        let trustLevel = null;
+                        if (wotObject.rate >= 80) {
+                            trustLevel = "Excellent";
+                        } else if (wotObject.rate >= 60) {
+                            trustLevel = "Good";
+                        } else if (wotObject.rate >= 40) {
+                            trustLevel = "Unsatisfactory";
+                        } else if (wotObject.rate >= 20) {
+                            trustLevel = "Poor";
+                        } else if (wotObject.rate >= 0) {
+                            trustLevel = "Very poor";
+                        } else {
+                            trustLevel = "Unknown";
+                        }
+
+                        if (dataMap[trustLevel] == null) {
+                            dataMap[trustLevel] = 0;
+                        }
+                        dataMap[trustLevel]++;
+                    }
+                    drawChart(dataMap, index);
+                });
+            }
+        });
+
+        // Evaluate the target url from WOT API and get tags to display
+        let currDomain = extractRootDomain(url);
+        sendUrlsForWOTCheck([currDomain], function (wotObjects) {
+            console.log(JSON.stringify(wotObjects));
+            if (wotObjects.length > 0) {
+                document.getElementById("tags-" + index).innerHTML = wotObjects[0].tags;
+                document.getElementById("severity-meter-" + index).value = wotObjects[0].rate;
+                if (wotObjects[0].rate < 0) {
+                    document.getElementById("severity-" + index).innerHTML = "This website has unknown reputation";
+                } else {
+                    document.getElementById("severity-" + index).innerHTML = "This website is " + wotObjects[0].rate + "% to be a good site.";
+                }
             }
         });
     }
@@ -192,43 +241,33 @@ function makeHttpObject() {
 }
 
 
-function drawChart(domainCountMap, index, url) {
+function drawChart(trustLevelMap, index) {
     // Calculate the sum of total links
     let validLinkCount = 0;
-    for (let domain in domainCountMap) {
-        validLinkCount += domainCountMap[domain];
+    for (let trustLevel in trustLevelMap) {
+        validLinkCount += trustLevelMap[trustLevel];
     }
 
-    // Transform domain map to percentage
-    let domainPercentMap = {};
-    for (let domain in domainCountMap) {
-        domainPercentMap[domain] = (domainCountMap[domain] * 100 / validLinkCount).toFixed(1);
+    // Transform trustLevel map to percentage
+    let trustLevelPercentMap = {};
+    for (let trustLevel in trustLevelMap) {
+        trustLevelPercentMap[trustLevel] = (trustLevelMap[trustLevel] * 100 / validLinkCount).toFixed(1);
     }
 
-    var domainData = [];
-    var domains = [];
+    var trustLevelData = [];
+    var trustLevels = [];
     var counts = [];
-    for (let domain in domainPercentMap) {
-        domains.push(domain + "(" + domainPercentMap[domain] + "%)");
-        counts.push(domainCountMap[domain]);
-    }
-
     var backgroundColor = [];
     var hoverBackgroundColor = [];
-
-    for (let i = 0; i < domains.length; i++) {
-        r = Math.floor(Math.random() * 200);
-        g = Math.floor(Math.random() * 200);
-        b = Math.floor(Math.random() * 200);
-        v = Math.floor(Math.random() * 500);
-        c = 'rgb(' + r + ', ' + g + ', ' + b + ')';
-        h = 'rgb(' + (r + 20) + ', ' + (g + 20) + ', ' + (b + 20) + ')';
-        backgroundColor.push(c);
-        hoverBackgroundColor.push(h);
+    for (let trustLevel in trustLevelPercentMap) {
+        trustLevels.push(trustLevel + "(" + trustLevelPercentMap[trustLevel] + "%)");
+        counts.push(trustLevelMap[trustLevel]);
+        backgroundColor.push(getTrustLevelColor(trustLevel, false));
+        hoverBackgroundColor.push(getTrustLevelColor(trustLevel, true));
     }
 
     var pieChartData = {};
-    pieChartData.labels = domains;
+    pieChartData.labels = trustLevels;
     pieChartData.datasets = [];
     pieChartData.datasets.push({
         data: counts,
@@ -243,20 +282,52 @@ function drawChart(domainCountMap, index, url) {
     var myChart = new Chart(ctx, {
         type: 'pie',
         data: pieChartData,
+        options: {
+            title: {
+                display: true,
+                text: 'Target Website Links Trust Chart'
+            }
+        }
     });
-
-    // Set severity by comparing the current url with the one in the chart
-    let currDomain = extractRootDomain(url);
-    let currDomainPercent = domainPercentMap[currDomain];
-    if (currDomainPercent == null) {
-        currDomainPercent = 0;
-    }
-
-    document.getElementById("severity-" + index).innerHTML = currDomainPercent + "% of the links in this websites are safe.";
-    document.getElementById("severity-meter-" + index).value = currDomainPercent;
 }
 
-function getLinksFromUrlPage(url, callback) {
+function getTrustLevelColor(trustLevel, isHover) {
+    let r = 0, g = 0, b = 0;
+    if (isHover) {
+        r += 20;
+        g += 20;
+        b += 20;
+    }
+    if (trustLevel == "Excellent") {
+        r += 0;
+        g += 230;
+        b += 0;
+    } else if (trustLevel == "Good") {
+        r += 0;
+        g += 153;
+        b += 51;
+    } else if (trustLevel == "Unsatisfactory") {
+        r += 0;
+        g += 0;
+        b += 230;
+    } else if (trustLevel == "Poor") {
+        r += 230;
+        g += 230;
+        b += 0;
+    } else if (trustLevel == "Very poor") {
+        r += 230;
+        g += 0;
+        b += 0;
+    } else {
+        // Unknown level
+        r += 209;
+        g += 209;
+        b += 224;
+    }
+    return 'rgb(' + r + ', ' + g + ', ' + b + ')';
+}
+
+function sendUrlToGetWebPageLinks(url, callback) {
     var request = makeHttpObject();
     request.open("GET", "https://anti-social-engineering-tool.mybluemix.net/links?url=" + url, true);
     request.send(null);
@@ -323,4 +394,75 @@ function getUrlSafeBrowserCheck(url, callback) {
 
     // Send out json body
     request.send(JSON.stringify(jsonRequestBody));
+}
+
+function sendUrlsForWOTCheck(domains, callback) {
+    var request = makeHttpObject();
+    let requestUrl = "https://api.mywot.com/0.4/public_link_json2?hosts=https://";
+    for (let domain of domains) {
+        requestUrl += domain + "/";
+    }
+    requestUrl += "&key=491c8197a10b1f60cd725ee5e9bbf51836676f71";
+    request.open("GET", requestUrl, true);
+    request.send(null);
+    request.onreadystatechange = function () {
+        if (request.readyState == 4) {
+            let jsonResponse = JSON.parse(request.responseText);
+            let wotObjects = [];
+            for (let domain in jsonResponse) {
+                let wotObject = {};
+                wotObject.domain = domain;
+                wotObject.rate = jsonResponse[domain]["0"] ? jsonResponse[domain]["0"][0] : -1;
+                wotObject.tags = [];
+                if (jsonResponse[domain]["categories"]) {
+                    for (let categoryCode in jsonResponse[domain]["categories"]) {
+                        if (getCategoryName(categoryCode) != null) {
+                            wotObject.tags.push(getCategoryName(categoryCode));
+                        }
+                    }
+                }
+                wotObjects.push(wotObject);
+            }
+            callback(wotObjects);
+        }
+    };
+}
+
+function getCategoryName(categoryCode) {
+    switch (categoryCode) {
+        case '101':
+            return "<span style=\"color:red\">Malware or viruses</span>";
+        case '102':
+            return "<span style=\"color:red\">Poor customer experience</span>";
+        case '103':
+            return "<span style=\"color:red\">Phishing</span>";
+        case '104':
+            return "<span style=\"color:red\">Scam</span>";
+        case '105':
+            return "<span style=\"color:red\">Potentially illegal</span>";
+        case '201':
+            return "<span style=\"color:darkgoldenrod\">Misleading claims or unethical</span>";
+        case '202':
+            return "<span style=\"color:darkgoldenrod\">Privacy risk</span>";
+        case '203':
+            return "<span style=\"color:darkgoldenrod\">Suspicious</span>";
+        case '204':
+            return "<span style=\"color:darkgoldenrod\">Hate, discrimination</span>";
+        case '205':
+            return "<span style=\"color:darkgoldenrod\">Spam</span>";
+        case '206':
+            return "<span style=\"color:darkgoldenrod\">Potentially unwanted programs</span>";
+        case '207':
+            return "<span style=\"color:darkgoldenrod\">Ads / pop-ups</span>";
+        case '301':
+            return "<span style=\"color:blue\">Online tracking</span>";
+        case '302':
+            return "<span style=\"color:blue\">Alternative or controversial medicine</span>";
+        case '303':
+            return "<span style=\"color:blue\">Opinions, religion, politics</span>";
+        case '501':
+            return "<span style=\"color:green\">Good site</span>";
+        default:
+            return null;
+    }
 }

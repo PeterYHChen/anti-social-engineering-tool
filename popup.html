@@ -20,25 +20,23 @@ value "popup.html".
 </head>
 
 <body>
+    <h1>Anti-Social Engineering Tool</h1>
+    <div id="container" class="select">
+        <select id="dropdown">
+            <option selected disabled hidden value=''>Pick an option</option>
+            <option value="evaluate">Evaluate Current Page</option>
+            <option value="analyze">Analyze Links</option>
+        </select>
+    </div>
+    <div id="popup-link">
+    </div>
 
-    <body>
-        <h1>Anti-Social Engineering Tool</h1>
-        <div id="container" class="select">
-            <select id="dropdown">
-                <option selected disabled hidden value=''>Pick an option</option>
-                <option value="evaluate">Evaluate Current Page</option>
-                <option value="analyze">Analyze Links</option>
-            </select>
-        </div>
-        <div id="popup-link">
-        </div>
-
-        <div id="meter">
-            <meter id="severity-meter" min="0" low="40" high="75" max="100" value="0" optimum="90"></meter>
-            <div id="severity"></div>
-        </div>
-        <div id="currUrl"></div>
-        <canvas id="pieChart" width="600" height="400"></canvas>
-    </body>
+    <div id="meter">
+        <meter id="severity-meter" min="0" low="40" high="75" max="100" value="0" optimum="90"></meter>
+        <div id="severity"></div>
+    </div>
+    <div id="currUrl"></div>
+    <canvas id="pieChart" width="400" height="400"></canvas>
+</body>
 
 </html>

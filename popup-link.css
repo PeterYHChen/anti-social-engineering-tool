@@ -28,6 +28,10 @@
     font-size: 120%
 }
 
+.popup-box .tags {
+    font-size: 80%
+}
+
 .popup-box .safety-bar {
     height: 20px;
     width: 100%;
