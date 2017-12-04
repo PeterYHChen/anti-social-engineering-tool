@@ -53,6 +53,8 @@ function changeDropdownOption(option) {
     var script;
     if (option == 'analyze') {
         analyze();
+    } else if (option == 'evaluate') {
+        evaluate();
     } else {
         // script = 'document.body.style.dropdown olor="' + option + '";';
         //   // See https://developer.chrome.com/extensions/tabs#method-executeScript.
@@ -73,16 +75,25 @@ function analyze() {
     chrome.tabs.insertCSS(null, { file: 'popup-link.css' });
 }
 
+function evaluate() {
+    chrome.tabs.executeScript(null, { file: 'chartjs/Chart.js' }, function () {
+        chrome.tabs.executeScript({ file: 'evaluate.js' });
+    });
+    chrome.tabs.insertCSS(null, { file: 'popup-link.css' });
+}
+
 chrome.runtime.onMessage.addListener(function (request, sender) {
     if (request.action == "getDomains") {
-        let domainMap = request.source;
-        console.log(domainMap);
-        drawChart(domainMap);
+        let domainObject = request.source;
+        console.log(domainObject);
+        drawChart(domainObject.domainCountMap, domainObject.baseUrl);
         return true;
     }
 });
 
-function drawChart(domainMap) {
+// Keep a reference to the created chart
+var myPieChart = null;
+function drawChart(domainMap, baseUrl) {
     // Calculate the sum of total links
     let validLinkCount = 0;
     for (let domain in domainMap) {
@@ -129,24 +140,26 @@ function drawChart(domainMap) {
     console.log(pieChartData);
     var ctx = document.getElementById("pieChart").getContext("2d");
 
-    var myChart = new Chart(ctx, {
-        type: 'pie',
-        data: pieChartData
-    });
+    if (myPieChart == null) {
+        myPieChart = new Chart(ctx, {
+            type: 'pie',
+            data: pieChartData
+        });
+    } else {
+        myPieChart.config.data = pieChartData;
+        myPieChart.update();
+    }
 
     // Set severity by comparing the current url with the one in the chart
-    getCurrentTabUrl((url) => {
-        // document.getElementById("currUrl").innerHTML = url;
-        let currDomain = extractRootDomain(url);
-        let currDomainPercent = domainPercentMap[currDomain];
-        if (currDomainPercent == null) {
-            currDomainPercent = 0;
-        }
-
-        document.getElementById("severity").innerHTML = currDomainPercent + "% of the links in this websites are safe.";
-        document.getElementById("severity-meter").value = currDomainPercent;
-        document.getElementById("severity-meter").title = url;
-    });
+    let currDomain = extractRootDomain(baseUrl);
+    let currDomainPercent = domainPercentMap[currDomain];
+    if (currDomainPercent == null) {
+        currDomainPercent = 0;
+    }
+    document.getElementById("currUrl").innerHTML = "Evaluating url: " + baseUrl;
+    document.getElementById("severity").innerHTML = currDomainPercent + "% of the links belongs to the website of this page.";
+    document.getElementById("severity-meter").value = currDomainPercent;
+    document.getElementById("severity-meter").title = baseUrl;
 }
 
 

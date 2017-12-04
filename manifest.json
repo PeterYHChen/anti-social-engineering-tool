@@ -11,6 +11,7 @@
     "permissions": [
         "https://anti-social-engineering-tool.mybluemix.net/*",
         "https://safebrowsing.googleapis.com/*",
+        "https://api.mywot.com/*",
         "activeTab",
         "storage"
     ]

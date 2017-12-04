@@ -19,11 +19,20 @@
     padding: 10px;
     background: rgba(256,256,256,1);
     color: #000000;
-    height: 400px;
+    height: auto;
     border: 1px solid #1a1a1a;
     font-size: 90%;
 }
 
 .popup-box .link-check {
     font-size: 120%
+}
+
+.popup-box .tags {
+    font-size: 80%
+}
+
+.popup-box .safety-bar {
+    height: 20px;
+    width: 100%;
 }
