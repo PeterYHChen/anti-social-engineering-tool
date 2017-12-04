@@ -1,5 +1,192 @@
 @import "compass/css3";
 
+/*Phone*/
+
+body {
+  background: #202545;
+}
+
+.phone {
+	transform: scale(0.3);
+	position: absolute;
+	margin-left: calc(50% - 110px);
+	margin-top: -130px;
+}
+
+.iPhone {
+  background: #fff;
+  border: solid 2px #c5c5c5;
+  height: 500px;
+  width: 260px;
+  border-radius: 30px;
+  position: relative;
+  margin: 0 auto;
+  box-shadow: 0 3px 5px 0 rgba(50, 50, 50, 0.25);
+  -webkit-transition: all 0.4s cubic-bezier(0.6, 0.04, 0.98, 0.335);
+  -moz-transition: all 0.4s cubic-bezier(0.6, 0.04, 0.98, 0.335);
+  transition: all 0.4s cubic-bezier(0.6, 0.04, 0.98, 0.335);
+}
+
+.iPhoneInner {
+  background: #fff;
+  border: solid 2px #b4b4b4;
+  height: 496px;
+  width: 256px;
+  border-radius: 30px;
+  position: relative;
+  margin: 0 auto;
+  box-shadow: 0 3px 5px 0 rgba(50, 50, 50, 0.75);
+  -webkit-transition: all 0.4s cubic-bezier(0.6, 0.04, 0.98, 0.335);
+  -moz-transition: all 0.4s cubic-bezier(0.6, 0.04, 0.98, 0.335);
+  transition: all 0.4s cubic-bezier(0.6, 0.04, 0.98, 0.335);
+}
+.iPhoneInner .circButton {
+  background: #fff;
+  border: solid 2px #3b3b3b;
+  width: 36px;
+  height: 36px;
+  position: relative;
+  margin: 0 auto;
+  border-radius: 50%;
+  top: 48px;
+  cursor: pointer;
+}
+.iPhoneInner .smallTopCirc {
+  background-color: #1f1f1f;
+  background-image: -webkit-linear-gradient(#1f1f1f, #141414);
+  background-image: linear-gradient(#1f1f1f, #141414);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  top: 6px;
+  position: relative;
+  margin: 0 auto;
+}
+.iPhoneInner .camera {
+  background-color: #1f1f1f;
+  background-image: -webkit-linear-gradient(#1f1f1f, #141414);
+  background-image: linear-gradient(#1f1f1f, #141414);
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: solid 1px #c5c5c5;
+  top: 17px;
+  left: 85px;
+}
+.iPhoneInner .oval {
+  background-color: #1f1f1f;
+  background-image: -webkit-linear-gradient(#1f1f1f, #141414);
+  background-image: linear-gradient(#1f1f1f, #141414);
+  width: 50px;
+  height: 4px;
+  top: 14px;
+  border-radius: 2px;
+  margin: 0 auto;
+  margin-bottom: -12px;
+  position: relative;
+}
+
+.iScreen {
+  position: relative;
+  width: 230px;
+  height: 400px;
+  margin: 0 auto;
+  top: 40px;
+  overflow: hidden;
+  background-color: #1f1f1f;
+  background-image: -webkit-linear-gradient(#1f1f1f, #141414);
+  background-image: linear-gradient(#1f1f1f, #141414);
+  background-image: url('out.jpg');
+  background-size: 216px;
+    border: solid 2px #3b3b3b;
+  -webkit-transition: all 0.4s cubic-bezier(0.6, 0.04, 0.98, 0.335);
+  -moz-transition: all 0.4s cubic-bezier(0.6, 0.04, 0.98, 0.335);
+  transition: all 0.4s cubic-bezier(0.6, 0.04, 0.98, 0.335);
+}
+.iScreen .usman {
+  opacity: 0;
+}
+.iScreen .usman img {
+  display: block;
+  max-width: 140px;
+  margin: 0 auto;
+  top: 120px;
+  position: relative;
+  -webkit-transition: all 0.6s;
+  -moz-transition: all 0.6s;
+  transition: all 0.6s;
+}
+.iScreen .usman .center {
+  display: block;
+  max-width: 140px;
+  margin: 0 auto;
+  right: 130px;
+  top: 0;
+  transition-delay: 2s;
+  -webkit-transition: all 0.6s;
+  -moz-transition: all 0.6s;
+  transition: all 0.6s;
+  position: relative;
+}
+.iScreen .showMe {
+  -webkit-transition: all 0.4s cubic-bezier(0.6, 0.04, 0.98, 0.335);
+  -moz-transition: all 0.4s cubic-bezier(0.6, 0.04, 0.98, 0.335);
+  transition: all 0.4s cubic-bezier(0.6, 0.04, 0.98, 0.335);
+  opacity: 1;
+}
+
+.turnOn {
+  -webkit-transition: all 0.4s cubic-bezier(0.6, 0.04, 0.98, 0.335);
+  -moz-transition: all 0.4s cubic-bezier(0.6, 0.04, 0.98, 0.335);
+  transition: all 0.4s cubic-bezier(0.6, 0.04, 0.98, 0.335);
+  background: #ffa8ea;
+  border: solid 2px #d1d1d1;
+}
+
+.rotate {
+  -webkit-transform: rotate(90deg);
+  -moz-transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  -o-transform: rotate(90deg);
+  transform: rotate(90deg);
+}
+
+.rotateBack {
+  -webkit-transform: rotate(-90deg);
+  -moz-transform: rotate(-90deg);
+  -ms-transform: rotate(-90deg);
+  -o-transform: rotate(-90deg);
+  transform: rotate(-90deg);
+}
+
+.noShad {
+  box-shadow: none;
+}
+
+.flip {
+  width: 260px;
+  max-width: 100%;
+  right: 0;
+  top: 0;
+  text-align: center;
+  display: block;
+  position: absolute;
+  background: #ffa8ea;
+  margin-bottom: 40px;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-family: "Satisfy", cursive;
+  cursor: pointer;
+  font-size: 2em;
+  top: 10px;
+  right: 10px;
+  border: solid 2px #fff;
+}
+
+/*End Phone */
+
 /*
 	A. Mini Reset 
 */
@@ -249,9 +436,9 @@ Table of Contents
 }
 
 .hardcover_front {
-	-webkit-transition: all 0.8s ease, z-index 0.6s;
-	-moz-transition: all 0.8s ease, z-index 0.6s;
-	transition: all 0.8s ease, z-index 0.6s;
+	-webkit-transition: all 0.8s ease, z-index 2.6s;
+	-moz-transition: all 0.8s ease, z-index 2.6s;
+	transition: all 0.8s ease, z-index 2.6s;
 }
 
 /* HARDCOVER front */

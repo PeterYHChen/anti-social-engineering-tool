@@ -1,13 +1,36 @@
-#CIMS {
+
+#description { font-family: "Courier New", Courier, monospace; 
+				font-size: 2em;
+				position: absolute; 
+				margin: 20px 20px 20px 20px;}
+#container { margin-top: 97px; }
+
+#bookA {
 	position: absolute;
 	top: 175px;
 	left: 48vw;
 	margin-left: -200px;
 }
 
-#AUTHORS {
+#bookB {
 	position: absolute;
 	top: 175px;
+	left: 50vw;
+	margin-left: 100px;
+}
+
+
+#bookC {
+	position: absolute;
+	top: 492px;
+	left: 48vw;
+	margin-left: -200px;
+}
+
+
+#bookD {
+	position: absolute;
+	top: 492px;
 	left: 50vw;
 	margin-left: 100px;
 }
