@@ -11,13 +11,19 @@ h1 {
     align-items: center;
     display: flex;
     justify-content: space-between;
-    float: right;
+    width: 60%;
+    margin: auto;
 }
+
+#title {
+    text-align: center;
+}
+
 
 
 #meter {
 	margin: 2em auto;
-    margin-top: 60px;
+    margin-top: 10px;
 }
 
 meter { 
