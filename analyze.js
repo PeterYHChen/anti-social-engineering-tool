@@ -1,5 +1,4 @@
 
-var domainMap = getDomainMapFromDoc(document, null);
 var links = document.getElementsByTagName("a");
 for (let i = 0; i < links.length; i++) {
     links[i].addEventListener("mouseenter", () => {
@@ -10,7 +9,7 @@ for (let i = 0; i < links.length; i++) {
     });
     links[i].innerHTML += "<div class=\"popup-box\" id=\"popup-link-" + i + "\">" +
         "<div id=\"link-check-" + i + "\" class=\"link-check\"></div>" +
-        "<meter id=\"severity-meter-" + i + "\" class=\"severity-bar\" min=\"0\" low=\"40\" high=\"75\" max=\"100\" value=\"0\" optimum=\"90\"></meter>" +
+        "<meter id=\"severity-meter-" + i + "\" class=\"safety-bar\" min=\"0\" low=\"40\" high=\"75\" max=\"100\" value=\"0\" optimum=\"90\"></meter>" +
         "<div id=\"severity-" + i + "\"></div>" +
         "<canvas id=\"pieChart-" + i + "\" width=\"500\" height=\"500\"></canvas>" +
         "</div>";
@@ -28,11 +27,6 @@ for (let i = 0; i < links.length; i++) {
         // links[i].innerText = links[i].innerText + '(' + links[i].href + ')';
     }
 }
-
-chrome.runtime.sendMessage({
-    action: "getDomains",
-    source: domainMap
-});
 
 function getDomainMapFromDoc(htmlDoc, baseUrl) {
     let links = htmlDoc.getElementsByTagName("a");
@@ -62,7 +56,7 @@ function getDomainCountMapFromUrls(urls, baseUrl) {
             }
             rootDomain = baseDomain;
         }
-        console.log(rootDomain + "    " + urls[i]);
+        // console.log(rootDomain + "    " + urls[i]);
 
         // Add to the map for counting
         if (domainCountMap[rootDomain] == null) {
@@ -130,10 +124,11 @@ function extractRootDomain(url) {
 }
 
 // Set up a global variable map to avoid re-sending request for the same url.
+var urlDomainCountMap = {};
 var urlCheckedMap = {};
 
 function showPopup(index, url) {
-    console.log(index);
+    // console.log(index);
     console.log(url);
     // this.style.color = "red";
     var popup = document.getElementById("popup-link-" + index);
@@ -141,33 +136,46 @@ function showPopup(index, url) {
 
     // Index is used to identify each url
     // If the url of current index has been visited and requests for it have been sent out
-    if (urlCheckedMap[index]) {
-        return;
+    if (!urlCheckedMap[index]) {
+        urlCheckedMap[index] = true;
+        getUrlSafeBrowserCheck(url, function (response) {
+            let linkCheck = document.getElementById("link-check-" + index);
+            linkCheck.innerText = response.message;
+            if (response.status == "SUCCESS") {
+                linkCheck.style.color = "green";
+            } else {
+                linkCheck.style.color = "red";
+            }
+            console.log("response: " + JSON.stringify(response));
+        });
+
+        getLinksFromUrlPage(url, function (arrayLinks) {
+            if (arrayLinks instanceof Array) {
+                let domainMap = getDomainCountMapFromUrls(arrayLinks, url);
+                urlDomainCountMap[index] = domainMap;
+                sendDataToExtentionPopup("getDomains", domainMap, url);
+                // drawChart(domainMap, index, url);
+            }
+        });
     }
-    urlCheckedMap[index] = true;
 
-    getUrlSafeBrowserCheck(url, function (response) {
-        let linkCheck = document.getElementById("link-check-" + index);
-        linkCheck.innerText = response.message;
-        if (response.status == "SUCCESS") {
-            linkCheck.style.color = "green";
-        } else {
-            linkCheck.style.color = "red";
-        }
-        console.log("response: " + JSON.stringify(response));
-    });
+    if (urlDomainCountMap[index]) {
+        sendDataToExtentionPopup("getDomains", urlDomainCountMap[index], url);
+    }
+}
 
-    getLinksFromUrlPage(url, function (arrayLinks) {
-        if (arrayLinks instanceof Array) {
-            let domainMap = getDomainCountMapFromUrls(arrayLinks, url);
-            drawChart(domainMap, index, url);
-        }
+function sendDataToExtentionPopup(action, domainCountMap, baseUrl) {
+    var domainObject = {};
+    domainObject.domainCountMap = domainCountMap;
+    domainObject.baseUrl = baseUrl;
+    chrome.runtime.sendMessage({
+        action: action,
+        source: domainObject
     });
 }
 
 function hidePopup(index) {
-    console.log(index);
-
+    // console.log(index);
     var popup = document.getElementById("popup-link-" + index);
     popup.style.display = "none";
 }
