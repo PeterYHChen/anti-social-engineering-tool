@@ -1025,6 +1025,24 @@ neck
 
 	"Other place = maybe less safe"
 
+	"Example: I'm in Facebook town. I see a LINK on the page that I like. If I am in Facebook town and nothing bad has happened, Facebook town is probably safe (maybe not, but probably). Going to another place that I do not know about is a risk, because I already know Facebook is probably safe. I do not know if the new place is safe. So, I should check and learn about the new place before I CLICK to go there."
+
+"Second step: even a safe place can have a danger!"
+
+"The way you get to the place matters - if a person gives you an EMAIL with a LINK, they sometimes have the power to do something because the LINK can tell your COMPUTER to do different things."
+
+"Example: I'm in Facebook town. I see a LINK on the page that I like. But it is from a person. That person could include bad things in the LINK, even if the LINK place is safe."
+
+"Third step: friends can tell each other mistakes they learn"
+
+"If you have friends to tell you if a place is safe because they have already been there, then that is better than knowing nothing about the place."
+
+"Example: If Facebook town is bad, maybe some people have visited there before, and they can tell others it is bad."
+
+"Three things: other places are sometimes less safe, LINKS can be bad if we do not learn about them, and bad places can be put on a list. We can make these practices better by using a tool. Click here for the tool! (You have to trust that this link is safe)."
+
+	
+
 	
 
 
