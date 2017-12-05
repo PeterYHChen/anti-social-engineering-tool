@@ -145,7 +145,7 @@ function showPopup(index, url) {
             let linkCheck = document.getElementById("link-check-" + index);
             linkCheck.innerText = response.message;
             if (response.status == "SUCCESS") {
-                linkCheck.style.color = "green";
+                linkCheck.style.color = "white";
             } else {
                 linkCheck.style.color = "red";
             }
@@ -200,9 +200,9 @@ function showPopup(index, url) {
                 document.getElementById("tags-" + index).innerHTML = wotObjects[0].tags;
                 document.getElementById("severity-meter-" + index).value = wotObjects[0].rate;
                 if (wotObjects[0].rate < 0) {
-                    document.getElementById("severity-" + index).innerHTML = "This website has unknown reputation";
+                    document.getElementById("severity-" + index).innerHTML = "This website's reputation is unknown (could be okay, or bad).";
                 } else {
-                    document.getElementById("severity-" + index).innerHTML = "This website is " + wotObjects[0].rate + "% to be a good site.";
+                    document.getElementById("severity-" + index).innerHTML = "This website is " + wotObjects[0].rate + "% confident to be a good site.";
                 }
             }
         });
@@ -285,7 +285,7 @@ function drawChart(trustLevelMap, index) {
         options: {
             title: {
                 display: true,
-                text: 'Target Website Links Trust Chart'
+                text: 'Link Chart'
             }
         }
     });
@@ -429,7 +429,7 @@ function sendUrlsForWOTCheck(domains, callback) {
 }
 
 function getCategoryName(categoryCode) {
-    switch (categoryCode) {
+    switch (categoryCode) { 
         case '101':
             return "<span style=\"color:red\">Malware or viruses</span>";
         case '102':
@@ -461,7 +461,7 @@ function getCategoryName(categoryCode) {
         case '303':
             return "<span style=\"color:blue\">Opinions, religion, politics</span>";
         case '501':
-            return "<span style=\"color:green\">Good site</span>";
+            return "<span style=\"color:white\">Good site</span>";
         default:
             return null;
     }

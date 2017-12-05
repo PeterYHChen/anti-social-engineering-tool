@@ -4,6 +4,8 @@ body {
     border-radius: 20px;
     background-color: #F3F3F3;
     height: 100px;
+    color: white;
+    background-image: url('https://images.unsplash.com/photo-1500485035595-cbe6f645feb1?auto=format&fit=crop&w=634&q=80&ixid=dW5zcGxhc2guY29tOzs7Ozs%3D');
 }
 
 
@@ -25,10 +27,14 @@ h1 {
 }
 
 #logo {
-  position: absolute;
+  position: fixed;
   bottom: 10px;
   right: 10px;
   border-radius: 25px;
+}
+
+canvas {
+
 }
 
 
@@ -42,6 +48,12 @@ meter {
     height: 20px;
     width: 100%;
     transition: width 500ms ease-in;
+    border-radius: 3px;
+
+ }
+
+ span {
+  margin: 20px;
  }
 
  /* Reset Select */

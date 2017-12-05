@@ -157,7 +157,7 @@ function drawChart(domainMap, baseUrl) {
         currDomainPercent = 0;
     }
     document.getElementById("currUrl").innerHTML = "Evaluating url: " + baseUrl;
-    document.getElementById("severity").innerHTML = currDomainPercent + "% of the links belongs to the website of this page.";
+    document.getElementById("severity").innerHTML = currDomainPercent + "% of the links belong to the website of this page.";
     document.getElementById("severity-meter").value = currDomainPercent;
     document.getElementById("severity-meter").title = baseUrl;
 }

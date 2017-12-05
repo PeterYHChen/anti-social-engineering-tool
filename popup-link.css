@@ -16,16 +16,22 @@
     position: absolute;
     z-index: 2000;
     width: auto;
-    padding: 10px;
+    padding: 30px;
     background: rgba(256,256,256,1);
     color: #111;
     border: 1px solid #1a1a1a;
     font-size: 90%;
     border-radius: 30px;
+    background-image: url('https://images.unsplash.com/photo-1500485035595-cbe6f645feb1?auto=format&fit=crop&w=634&q=80&ixid=dW5zcGxhc2guY29tOzs7Ozs%3D');
 }
+
+ span {
+  margin: 20px;
+ }
 
 .popup-box .link-check {
     font-size: 120%
+    padding: 20px;
 }
 
 .popup-box .tags {
