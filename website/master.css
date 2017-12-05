@@ -1,8 +1,9 @@
 
 #description { font-family: "Courier New", Courier, monospace; 
 				font-size: 2em;
-				position: absolute; 
-				margin: 20px 20px 20px 20px;}
+				position: absolute;
+				color: black; 
+				margin: 2em;}
 #container { margin-top: 97px; }
 
 #bookA {
@@ -32,5 +33,12 @@
 	position: absolute;
 	top: 492px;
 	left: 50vw;
-	margin-left: 100px;
+	margin-left: 100px
+}
+
+body {
+	background: url('https://images.unsplash.com/photo-1481278403982-f2d9f387cdcc?auto=format&fit=crop&w=1050&q=80&ixid=dW5zcGxhc2guY29tOzs7Ozs%3D') center center no-repeat;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: scroll;
 }
