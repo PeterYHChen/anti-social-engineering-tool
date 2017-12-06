@@ -164,6 +164,7 @@ function showPopup(index, url) {
                 for (let domain in domainCountMap) {
                     domains.push(domain);
                 }
+
                 sendUrlsForWOTCheck(domains, function (wotObjects) {
                     let dataMap = {};
                     for (let wotObject of wotObjects) {
@@ -392,6 +393,10 @@ function getUrlSafeBrowserCheck(url, callback) {
         }
     };
 
+    url_str = String(url);
+    if (/script/.test(url_str)) {
+        alert("This link has a <script> which can be dangerous! Don't click it! - Your friendly Anti-social Engineering Defender");
+    }
     // Send out json body
     request.send(JSON.stringify(jsonRequestBody));
 }
