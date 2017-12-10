@@ -4,6 +4,9 @@ A chrome extension that helps users to avoid tricks in social engineering. With 
 ## Introduction
 This a chrome extenstion that provides functionalities to analyze sites when hovering on them.
 
+Here is an example of good site, which is official website of New York University.
+<img src="screenshots/good-website-screenshot.png" width="100%">
+
 ### Steps to Use
 * By clicking on an extension icon at the top-right corner, a popup is displayed.
 * Select "Analyze links" to analyze all links on the current website, then the analyzed links would be displayed in green.
@@ -18,17 +21,10 @@ This a chrome extenstion that provides functionalities to analyze sites when hov
 
 + In the top-right corner, another popup is displayed to show a domain distribution pie chart of the hovered site, indicating how many links inside the hovered site belongs to the same domain, and what those domains are.
 
-## Example of Good-reputation Website
-Here is an example of good site, which is official website of New York University.
-
-<img src="screenshots/good-website-screenshot.png" width="100%">
-
 ## Example of Low-reputation Website
 Here is a screenshot of our extension when hovering on a website with low reputation.
-
 <img src="screenshots/bad-website-screenshot.png" width="100%">
 
 ## Example of Malware Website
 When a threat is discovered, Google Safe Browsing API would indicate what it is.
-
 <img src="screenshots/virus-website.png" width="100%">
